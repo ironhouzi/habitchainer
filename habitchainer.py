@@ -119,12 +119,12 @@ class Schedule(object):
         return self.currentTask
 
     def serializeCompletedTasks(self):
-        jsondump = []
+        structure = []
 
         for task in self.completedTasks:
-            jsondump.append((task[0].name, task[1]))
+            structure.append((task[0].name, task[1].timestamp))
 
-        return json.dumps(jsondump)
+        return json.dumps(structure)
 
     def extractTimestamp(self, line):
         """ Input: string. org-mode line containing timestamp.
