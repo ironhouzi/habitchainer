@@ -76,6 +76,7 @@ class Schedule(object):
         self.completedTasks = []
         self.time = arrow.utcnow()
         self.currentTask = None
+        self.remainingTasks = 0
 
     def scheduleDay(self):
         """Returns day in three letter format."""
@@ -97,6 +98,7 @@ class Schedule(object):
     def completeCurrentTask(self):
         self.completedTasks.append(self.currentTask)
         self.currentTask = self.dequeue()
+        self.remainingTasks -= 1
 
     def getCurrentTask(self):
         """ Returns None if all tasks are done. """
@@ -225,15 +227,8 @@ class Schedule(object):
             elif state['propertiesStarted'] and gotHabitProperty and \
                     endRegex.match(line):
                 self.enqueue(habit)
-
-                if habit.scheduled:
-                    sched = habit.scheduled.format('HH:mm - ')
-                else:
-                    sched = '        '
-
-                print("%s%s : %s" % (sched,
-                                     habit.deadline.format('HH:mm'),
-                                     habit.name))
+                self.remainingTasks += 1
+                self.printHabit(habit)
                 habit = Habit()
                 state = self.newState()
                 gotData = False
@@ -250,6 +245,16 @@ class Schedule(object):
                 return
 
             f.close()
+
+    def printHabit(self, habit):
+        if habit.scheduled:
+            sched = habit.scheduled.format('HH:mm - ')
+        else:
+            sched = '        '
+
+        print("%s%s : %s" % (sched,
+                             habit.deadline.format('HH:mm'),
+                             habit.name))
 
 
 def main(args):
