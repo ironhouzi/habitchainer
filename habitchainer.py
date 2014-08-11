@@ -78,12 +78,14 @@ class Schedule(object):
         self.currentTask = None
         self.remainingTasks = 0
 
-    def scheduleDay(self):
+    def day(self):
         """Returns day in three letter format."""
         return self.time.format('ddd')
 
-    def scheduleDate(self):
-        """Returns tuple: (YYYY, M, D)"""
+    def date(self, string=False):
+        """Returns tuple: (YYYY, M, D) or string."""
+        if string:
+            return self.time.format('YYYY-M-D')
         return self.time.date()
 
     def enqueue(self, habit):
@@ -101,6 +103,9 @@ class Schedule(object):
             return heapq.heappop(self.pendingTasks)[1]
         except IndexError:
             return None
+        except TypeError:
+            print("Error! : Check if two tasks have the same scheduled time.")
+            sys.exit()
 
     def completeCurrentTask(self):
         self.completedTasks.append((self.currentTask, arrow.utcnow()))
@@ -112,6 +117,10 @@ class Schedule(object):
         if not self.currentTask:
             self.currentTask = self.dequeue()
         return self.currentTask
+
+    def serializeCompletedTasks(self):
+        for task in self.completedTasks:
+            pass
 
     def extractTimestamp(self, line):
         """ Input: string. org-mode line containing timestamp.
@@ -267,7 +276,13 @@ class Schedule(object):
 def main(args):
     sched = Schedule()
     sched.parseOrgFile(args[1])
-    s = sched.getCurrentTask()[0].jsonEncode()
+    s = sched.getCurrentTask().jsonEncode()
+    sched.completeCurrentTask()
+    s = sched.getCurrentTask().jsonEncode()
+    sched.completeCurrentTask()
+    s = sched.getCurrentTask().jsonEncode()
+    sched.completeCurrentTask()
+    s = sched.getCurrentTask().jsonEncode()
     print(s)
 
 
