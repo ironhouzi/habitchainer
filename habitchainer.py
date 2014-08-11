@@ -1,4 +1,4 @@
-from queue import PriorityQueue
+import heapq
 import sys
 import re
 import arrow
@@ -71,10 +71,11 @@ class Habit(object):
 
 
 class Schedule(object):
-    def __init__(self, size=200):
-        self.pendingTasks = PriorityQueue(size)
+    def __init__(self):
+        self.pendingTasks = []
         self.completedTasks = []
         self.time = arrow.utcnow()
+        self.currentTask = None
 
     def scheduleDay(self):
         """Returns day in three letter format."""
@@ -85,11 +86,13 @@ class Schedule(object):
         return self.time.date()
 
     def enqueue(self, habit):
-        self.pendingTasks.put_nowait((habit.deadline.timestamp, habit))
+        heapq.heappush(self.pendingTasks, (habit.deadline.timestamp, habit))
 
     def dequeue(self):
-        completedTask = (self.pendingTasks.get_nowait()[1], arrow.utcnow())
-        self.completedTasks.append(completedTask)
+        try:
+            return (heapq.heappop(self.pendingTasks)[1], arrow.utcnow())
+        except IndexError:
+            return None
 
     def extractTimestamp(self, line):
         """ Input: string. org-mode line containing timestamp.
@@ -214,12 +217,12 @@ class Schedule(object):
                 self.enqueue(habit)
 
                 if habit.scheduled:
-                    sched = habit.scheduled.format('hh:mm - ')
+                    sched = habit.scheduled.format('HH:mm - ')
                 else:
                     sched = '        '
 
                 print("%s%s : %s" % (sched,
-                                     habit.deadline.format('hh:mm'),
+                                     habit.deadline.format('HH:mm'),
                                      habit.name))
                 habit = Habit()
                 state = self.newState()
