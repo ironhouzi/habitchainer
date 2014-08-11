@@ -87,7 +87,14 @@ class Schedule(object):
         return self.time.date()
 
     def enqueue(self, habit):
-        heapq.heappush(self.pendingTasks, (habit.deadline.timestamp, habit))
+        timestamp = ''
+
+        if habit.scheduled:
+            timestamp = habit.scheduled.timestamp
+        else:
+            timestamp = habit.deadline.timestamp
+
+        heapq.heappush(self.pendingTasks, (timestamp, habit))
 
     def dequeue(self):
         try:
