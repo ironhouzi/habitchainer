@@ -26,8 +26,13 @@ class Respond(Protocol):
             self.transport.write(jsonstring)
         elif self.jsonRegex.match(datastring):
             self.factory.schedule.completeCurrentTask()
-            jsonstring = self.factory.schedule.getCurrentTask().jsonEncode()
-            self.transport.write(jsonstring)
+            task = self.factory.schedule.getCurrentTask()
+
+            if task:
+                jsonstring = task.jsonEncode()
+                self.transport.write(jsonstring)
+            else:
+                self.transport.write(bytes('alldone', 'UTF-8'))
         else:
             print("else")
 
