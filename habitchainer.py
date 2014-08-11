@@ -60,10 +60,10 @@ class Habit(object):
         values = [self.name, self.deadline.timestamp,
                   scheduled, self.recurrence]
         result = dict(zip(self.keys, values))
-        return json.dumps(result)
+        return bytes(json.dumps(result), 'UTF-8')
 
     def jsonDecode(self, jsonString):
-        datadict = json.loads(jsonString)
+        datadict = json.loads(jsonString.decode('UTF-8').strip())
         self.name = datadict[self.keys[0]]
         self.scheduled = datadict[self.keys[1]]
         self.deadline = datadict[self.keys[2]]
@@ -91,12 +91,12 @@ class Schedule(object):
 
     def dequeue(self):
         try:
-            return (heapq.heappop(self.pendingTasks)[1], arrow.utcnow())
+            return heapq.heappop(self.pendingTasks)[1]
         except IndexError:
             return None
 
     def completeCurrentTask(self):
-        self.completedTasks.append(self.currentTask)
+        self.completedTasks.append((self.currentTask, arrow.utcnow()))
         self.currentTask = self.dequeue()
         self.remainingTasks -= 1
 
@@ -260,6 +260,8 @@ class Schedule(object):
 def main(args):
     sched = Schedule()
     sched.parseOrgFile(args[1])
+    s = sched.getCurrentTask()[0].jsonEncode()
+    print(s)
 
 
 if __name__ == '__main__':
