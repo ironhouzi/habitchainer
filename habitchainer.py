@@ -94,6 +94,16 @@ class Schedule(object):
         except IndexError:
             return None
 
+    def completeCurrentTask(self):
+        self.completedTasks.append(self.currentTask)
+        self.currentTask = self.dequeue()
+
+    def getCurrentTask(self):
+        """ Returns None if all tasks are done. """
+        if not self.currentTask:
+            self.currentTask = self.dequeue()
+        return self.currentTask
+
     def extractTimestamp(self, line):
         """ Input: string. org-mode line containing timestamp.
             Output: (Arrow, string). Date object & recurrence info."""
