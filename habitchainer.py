@@ -75,7 +75,6 @@ class Schedule(object):
         self.pendingTasks = []
         self.completedTasks = []
         self.time = arrow.utcnow()
-        self.currentTask = None
         self.remainingTasks = 0
 
     def day(self):
@@ -89,6 +88,8 @@ class Schedule(object):
         return self.time.date()
 
     def enqueue(self, habit):
+        """Inserts into the heapq: (timestamp, habit). The heapq priority is
+           ordered by timestamp, hence no two timestamps can be identical."""
         timestamp = ''
 
         if habit.scheduled:
@@ -108,21 +109,24 @@ class Schedule(object):
             sys.exit()
 
     def completeCurrentTask(self):
-        self.completedTasks.append((self.currentTask, arrow.utcnow()))
-        self.currentTask = self.dequeue()
+        task = self.dequeue()
+        if not task and self.remainingTasks > 0:
+            print("Queue error!")
+        self.completedTasks.append((task, arrow.utcnow().timestamp))
         self.remainingTasks -= 1
 
-    def getCurrentTask(self):
-        """ Returns None if all tasks are done. """
-        if not self.currentTask:
-            self.currentTask = self.dequeue()
-        return self.currentTask
+    # def getCurrentTask(self):
+    #     """ Returns None if all tasks are done. """
+    #     if not self.currentTask:
+    #         self.currentTask = self.dequeue()
+    #     return self.currentTask
 
     def serializeCompletedTasks(self):
         structure = []
 
         for task in self.completedTasks:
-            structure.append((task[0].name, task[1].timestamp))
+            l = (task[0].name, task[0].deadline, task[1].timestamp, )
+            structure.append(l)
 
         return json.dumps(structure)
 
@@ -280,14 +284,6 @@ class Schedule(object):
 def main(args):
     sched = Schedule()
     sched.parseOrgFile(args[1])
-    s = sched.getCurrentTask().jsonEncode()
-    sched.completeCurrentTask()
-    s = sched.getCurrentTask().jsonEncode()
-    sched.completeCurrentTask()
-    s = sched.getCurrentTask().jsonEncode()
-    sched.completeCurrentTask()
-    s = sched.getCurrentTask().jsonEncode()
-    print(s)
 
 
 if __name__ == '__main__':
