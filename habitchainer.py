@@ -75,7 +75,7 @@ class Schedule(object):
         self.pendingTasks = []
         self.completedTasks = []
         self.time = arrow.utcnow()
-        self.remainingTasks = 0
+        self.allDone = False
 
     def day(self):
         """Returns day in three letter format."""
@@ -103,17 +103,16 @@ class Schedule(object):
         try:
             return heapq.heappop(self.pendingTasks)[1]
         except IndexError:
-            return None
+            self.allDone = True
         except TypeError:
             print("Error! : Check if two tasks have the same scheduled time.")
             sys.exit()
 
     def completeCurrentTask(self):
         task = self.dequeue()
-        if not task and self.remainingTasks > 0:
+        if not task and not self.allDone:
             print("Queue error!")
         self.completedTasks.append((task, arrow.utcnow().timestamp))
-        self.remainingTasks -= 1
 
     # def getCurrentTask(self):
     #     """ Returns None if all tasks are done. """
@@ -125,7 +124,7 @@ class Schedule(object):
         structure = []
 
         for task in self.completedTasks:
-            l = (task[0].name, task[0].deadline, task[1].timestamp, )
+            l = (task[0].name, task[0].deadline, task[1], )
             structure.append(l)
 
         return json.dumps(structure)
@@ -251,7 +250,6 @@ class Schedule(object):
             elif state['propertiesStarted'] and gotHabitProperty and \
                     endRegex.match(line):
                 self.enqueue(habit)
-                self.remainingTasks += 1
                 self.printHabit(habit)
                 habit = Habit()
                 state = self.newState()
