@@ -93,8 +93,9 @@ class Schedule(HabitParser):
 
     def getPendingHabit(self):
         habit = self.dequeue()
-        self.enqueue(habit)
-        print(habit.name)
+        if habit:
+            self.enqueue(habit)
+            print(habit.name)
         return habit
 
 

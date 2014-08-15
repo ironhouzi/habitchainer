@@ -32,9 +32,12 @@ class Respond(Protocol):
     def sendNextHabit(self):
         jsonobject = ['next']
         habit = self.factory.schedule.getPendingHabit()
-        jsonobject.append(habit.name)
-        jsonobject.append(habit.deadline.format('HH:mm'))
-        self.transport.write(self.encodeUTF(json.dumps(jsonobject)))
+        if habit:
+            jsonobject.append(habit.name)
+            jsonobject.append(habit.deadline.format('HH:mm'))
+            self.transport.write(self.encodeUTF(json.dumps(jsonobject)))
+        else:
+            self.sendCommand('alldone')
 
     def sendCommand(self, command):
         self.transport.write(self.encodeUTF(json.dumps([command])))
