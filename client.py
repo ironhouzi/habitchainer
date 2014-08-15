@@ -39,13 +39,13 @@ def chainCount(daycount):
 def main(args):
     message = None
     jsonRegex = re.compile(r'^\{|\[.*\]|\}$')
-    rcdir = "~/.config/habitchainer/"
+    rcdir = "/home/dorbin/.config/habitchainer/"
     rcfile = "hcrc"
     rcpath = rcdir + rcfile
     host = ''
 
     if not os.path.isdir(rcdir):
-        os.mkdir(rcdir)
+        os.makedirs(rcdir)
 
     if os.path.isfile(rcpath):
         with open(rcpath, 'r') as f:
@@ -53,6 +53,10 @@ def main(args):
             host = info[0]
 
     message = json.dumps((args[1], ))
+    isnumRegex = re.compile(r'^[0,1,2]\d{2}.')
+
+    if not isnumRegex.match(host[0]):
+        host = socket.gethostbyname(host)
 
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.connect((host, 13373))
@@ -64,7 +68,7 @@ def main(args):
 
         if reply[0] == 'prompt':
             print(mainPrompt(reply[1], reply[2]))
-        elif reply[0] == 'habit':
+        elif reply[0] == 'next':
             print(reply[1], '-', reply[2])
 
     s.close()
