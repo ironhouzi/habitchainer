@@ -79,6 +79,9 @@ class ScheduleFactory(Factory):
 
 
 class HabitServer(object):
+    """
+    Input: (port, orgfile)
+    """
     def __init__(self, args):
         self.schedule = habitchainer.Schedule()
         self.orgfile = args[2]
