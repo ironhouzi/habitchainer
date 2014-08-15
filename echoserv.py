@@ -24,13 +24,13 @@ class Respond(Protocol):
         elif structure[0] == 'done':
             self.factory.schedule.completeCurrentTask()
             self.sendCommand('OK')
-        elif structure[0] == 'habit':
-            self.sendHabit()
+        elif structure[0] == 'next':
+            self.sendNextHabit()
         else:
             self.sendCommand('nop')
 
-    def sendHabit(self):
-        jsonobject = ['habit']
+    def sendNextHabit(self):
+        jsonobject = ['next']
         habit = self.factory.schedule.getPendingHabit()
         jsonobject.append(habit.name)
         jsonobject.append(habit.deadline.format('HH:mm'))

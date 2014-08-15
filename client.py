@@ -3,6 +3,8 @@ import socket
 import json
 import sys
 import re
+import os
+
 
 def mainPrompt(dailystatus, chaincount):
     prompts = [
@@ -13,12 +15,15 @@ def mainPrompt(dailystatus, chaincount):
         r'%F{220}★ %F{255}∙ ∙',
         r'%F{220}★ %F{255}∙ %F{220}★ %F{255}',
         r'%F{220}★★  %F{255}∙',
-        r'%F{220}★★★   %F{255}' ]
+        r'%F{220}★★★   %F{255}']
 
     return ''.join([prompts[dailystatus], '%F{255}',
                    chainCount(chaincount), ' '])
 
+
 def chainCount(daycount):
+    """ Input: number of days in current chain (int)
+        Output: pretty glyph representing this number"""
     if daycount == 0:
         ordval = ord('\u24ea')
     elif daycount <= 20:
@@ -30,14 +35,27 @@ def chainCount(daycount):
 
     return chr(ordval)
 
+
 def main(args):
     message = None
     jsonRegex = re.compile(r'^\{|\[.*\]|\}$')
+    rcdir = "~/.config/habitchainer/"
+    rcfile = "hcrc"
+    rcpath = rcdir + rcfile
+    host = ''
+
+    if not os.path.isdir(rcdir):
+        os.mkdir(rcdir)
+
+    if os.path.isfile(rcpath):
+        with open(rcpath, 'r') as f:
+            info = json.loads(f.readline())
+            host = info[0]
 
     message = json.dumps((args[1], ))
 
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    s.connect(('192.168.1.130', 13373))
+    s.connect((host, 13373))
     s.send(bytes(message, 'UTF-8'))
     reply = s.recv(1024).decode('UTF-8')
 

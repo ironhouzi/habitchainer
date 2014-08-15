@@ -54,6 +54,9 @@ class Schedule(HabitParser):
             self.completedTasks.append((habit, arrow.utcnow().replace(hour=6).timestamp))
 
     def period(self, hour):
+        """ Input: int representing hour (0-23)
+            Returns: the number representing the daily time period.
+            (morning, midday, evening)."""
         if (1 < hour < 9):
             return 0
         elif (8 < hour < 18):
@@ -64,13 +67,13 @@ class Schedule(HabitParser):
     def getDailyStatus(self):
         """This status represents the completion of the three daily time
         periods: morning (0), day (1), evening (2), are  represented in binary
-        values (4, 2, 1, respectively). retvalue is the sum of these values,
-        just like a linux file permission value (eg. chmod 755)."""
-        # TODO: find the proper English word
-        frequency = [0, 0, 0]
+        values (4, 2, 1, respectively).
+        Returns: the sum of these values (0-7), just like a linux file
+        permission value (eg. as in: 'chmod 755'). """
+        distribution = [0, 0, 0]
 
         for time in self.deadlines:
-            frequency[self.period(time.hour)] += 1
+            distribution[self.period(time.hour)] += 1
 
         for task in self.completedTasks:
             deadline = task[0].deadline
@@ -78,12 +81,12 @@ class Schedule(HabitParser):
             deadline = deadline.replace(month=today.month, day=today.day)
 
             if deadline > arrow.get(task[1]):
-                frequency[self.period(deadline.hour)] -= 1
+                distribution[self.period(deadline.hour)] -= 1
 
         values = [4, 2, 1]
         retval = 0
 
-        for i, f in enumerate(frequency):
+        for i, f in enumerate(distribution):
             if f == 0:
                 retval += values[i]
 
