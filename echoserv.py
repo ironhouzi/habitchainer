@@ -53,7 +53,7 @@ class ScheduleFactory(Factory):
         self.schedule = schedule
         self.chainlength = chainlength
         self.orgfile = orgfile
-        self.d = self.updateSchedule(10)
+        self.d = self.updateSchedule(self.secondsToMidnight())
         self.d.addCallback(self.newDay)
 
     def updateSchedule(self, timeout):
@@ -69,8 +69,7 @@ class ScheduleFactory(Factory):
 
         self.schedule = habitchainer.Schedule()
         self.schedule.parseOrgFile(self.orgfile)
-        # self.updateSchedule(self.secondsToMidnight())
-        self.updateSchedule(10)
+        self.updateSchedule(self.secondsToMidnight())
 
     def secondsToMidnight(self):
         now = arrow.now()
