@@ -4,7 +4,12 @@ import json
 import sys
 import re
 import os
+from argparse import ArgumentParser
 
+rcdir = os.path.expandvars("$HOME/.config/habitchainer/")
+rcfile = "hcrc"
+dirtyfile = "dirty"
+rcpath = rcdir + rcfile
 
 def mainPrompt(dailystatus, chaincount):
     prompts = [
@@ -37,29 +42,42 @@ def chainCount(daycount):
 
 
 def main(args):
+    parser = ArgumentParser()
     message = None
     jsonRegex = re.compile(r'^\{|\[.*\]|\}$')
-    rcdir = "/home/dorbin/.config/habitchainer/"
-    rcfile = "hcrc"
-    rcpath = rcdir + rcfile
-    host = ''
+    host = '192.168.1.117'
+    parser.add_argument("command", help="Specifies the return value.")
+    parser.add_argument("--host", help="Provide ip address or host name.")
+    args = parser.parse_args()
+
+    if args.host:
+        host = args.host
 
     if not os.path.isdir(rcdir):
         os.makedirs(rcdir)
 
     if os.path.isfile(rcpath):
-        with open(rcpath, 'r') as f:
-            info = json.loads(f.readline())
-            host = info[0]
+        if args.host:
+            with open(rcpath, 'w') as f:
+                f.write(json.dumps([args.host]))
+        else:
+            with open(rcpath, 'r') as f:
+                info = json.loads(f.readline())
+                host = info[0]
 
-    message = json.dumps((args[1], ))
+    message = json.dumps((args.command, ))
     isnumRegex = re.compile(r'^[0,1,2]\d{2}.')
 
-    if not isnumRegex.match(host[0]):
+    if not isnumRegex.match(host):
         host = socket.gethostbyname(host)
 
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    s.connect((host, 13373))
+
+    try:
+        s.connect((host, 13373))
+    except:
+        sys.exit()
+
     s.send(bytes(message, 'UTF-8'))
     reply = s.recv(1024).decode('UTF-8')
 
@@ -69,9 +87,18 @@ def main(args):
         if reply[0] == 'prompt':
             print(mainPrompt(reply[1], reply[2]))
         elif reply[0] == 'next':
-            print(reply[1], '-', reply[2])
+            print(reply[1], '- Deadline:', reply[2])
 
     s.close()
+
+# def offlineMode():
+#     dirtypath = rcdir + dirtyfile
+#     if os.path.isfile(dirtypath):
+#         pass
+#     else:
+#         with open(dirtypath, 'w') as f:
+#             status = ['prompt',
+#             f.write(
 
 
 if __name__ == '__main__':
