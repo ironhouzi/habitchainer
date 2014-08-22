@@ -50,11 +50,11 @@ class Schedule(HabitParser):
             print("Queue error!")
 
         if habit:
-            currentTime = arrow.utcnow().timestamp
+            currentTime = arrow.utcnow()
             print("Completed:", habit.name, "w/ deadline:",
                   habit.deadline.format('HH:mm'), "-",
                   currentTime.format('HH:mm'))
-            self.completedTasks.append((habit, currentTime, ))
+            self.completedTasks.append((habit, currentTime.timestamp, ))
 
     def period(self, hour):
         """ Input: int representing hour (0-23)
