@@ -65,7 +65,10 @@ class ScheduleFactory(Factory):
         return d
 
     def newDay(self):
-        if self.schedule.getDailyStatus() == 7:
+        status = self.schedule.getDailyStatus()
+        print("Daily status:", status)
+
+        if status == 7:
             self.chainlength += 1
         else:
             self.chainlength = 0
