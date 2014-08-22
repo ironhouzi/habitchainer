@@ -85,6 +85,8 @@ class Schedule(HabitParser):
             today = arrow.get(task[1]).date()
             deadline = deadline.replace(month=today.month, day=today.day)
 
+            print(deadline, arrow.get(task[1]), self.period(deadline.hour))
+
             if deadline > arrow.get(task[1]):
                 distribution[self.period(deadline.hour)] -= 1
 
