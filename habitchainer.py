@@ -3,6 +3,8 @@ import sys
 import arrow
 from orghabitparser import HabitParser
 
+# TODO: Add timezone from client request
+
 
 class Schedule(HabitParser):
     def __init__(self):
@@ -50,7 +52,7 @@ class Schedule(HabitParser):
             print("Queue error!")
 
         if habit:
-            currentTime = arrow.utcnow()
+            currentTime = arrow.now('Europe/Oslo')
             print("Completed:", habit.name, "w/ deadline:",
                   habit.deadline.format('HH:mm'), "-",
                   currentTime.format('HH:mm'))
