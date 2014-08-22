@@ -94,6 +94,7 @@ class Schedule(HabitParser):
             if f == 0:
                 retval += values[i]
 
+        print("returning", retval)
         return retval
 
     def getPendingHabit(self):
