@@ -52,7 +52,8 @@ class Schedule(HabitParser):
         if habit:
             currentTime = arrow.utcnow().timestamp
             print("Completed:", habit.name, "w/ deadline:",
-                  habit.deadline.time(), "-", currentTime.time())
+                  habit.deadline.format('HH:mm'), "-",
+                  currentTime.format('HH:mm'))
             self.completedTasks.append((habit, currentTime, ))
 
     def period(self, hour):
