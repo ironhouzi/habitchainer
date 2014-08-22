@@ -50,7 +50,10 @@ class Schedule(HabitParser):
             print("Queue error!")
 
         if habit:
-            self.completedTasks.append((habit, arrow.utcnow().timestamp, ))
+            currentTime = arrow.utcnow().timestamp
+            print("Completed:", habit.name, "w/ deadline:",
+                  habit.deadline.time(), "-", currentTime.time())
+            self.completedTasks.append((habit, currentTime, ))
 
     def period(self, hour):
         """ Input: int representing hour (0-23)
@@ -82,7 +85,7 @@ class Schedule(HabitParser):
             if deadline > arrow.get(task[1]):
                 distribution[self.period(deadline.hour)] -= 1
 
-        values = [4, 2, 1]
+        values = (4, 2, 1,)
         retval = 0
 
         for i, f in enumerate(distribution):
@@ -93,9 +96,11 @@ class Schedule(HabitParser):
 
     def getPendingHabit(self):
         habit = self.dequeue()
+
         if habit:
             self.enqueue(habit)
             print(habit.name)
+
         return habit
 
 
