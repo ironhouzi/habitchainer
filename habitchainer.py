@@ -89,6 +89,7 @@ class Schedule(HabitParser):
         values = (4, 2, 1,)
         retval = 0
 
+        print(distribution)
         for i, f in enumerate(distribution):
             if f == 0:
                 retval += values[i]
