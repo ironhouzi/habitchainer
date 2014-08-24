@@ -53,9 +53,8 @@ class Schedule(HabitParser):
 
         if habit:
             currentTime = arrow.now(LTZ)
-            print("COMPLETED:", habit.name, "@",
-                  currentTime.format('HH:mm'), "w/ deadline:",
-                  habit.deadline.format('HH:mm'))
+            print("COMPLETED @", currentTime.format('HH:mm'), ":",
+                  habit.name, "w/ deadline:", habit.deadline.format('HH:mm'))
             self.completedTasks.append((habit, currentTime.timestamp, ))
 
     def period(self, hour):
