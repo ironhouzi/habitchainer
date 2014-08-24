@@ -3,6 +3,8 @@ import sys
 import arrow
 from orghabitparser import HabitParser
 
+LTZ = 'Europe/Oslo'
+
 # TODO: Add timezone from client request
 
 
@@ -14,7 +16,6 @@ class Schedule(HabitParser):
         self.time = arrow.utcnow()
         self.allDone = False
         self.remainingTasks = 0
-        self.chainlength = 0
 
     def enqueue(self, habit):
         """Inserts into the heapq: (timestamp, habit). The heapq priority is
@@ -36,7 +37,6 @@ class Schedule(HabitParser):
 
             if not self.allDone and self.remainingTasks == 0:
                 self.allDone = True
-                self.chainlength += 1
 
             return item
         except IndexError:
@@ -52,8 +52,8 @@ class Schedule(HabitParser):
             print("Queue error!")
 
         if habit:
-            currentTime = arrow.now('Europe/Oslo')
-            print("Completed:", habit.name, "@",
+            currentTime = arrow.now(LTZ)
+            print("COMPLETED:", habit.name, "@",
                   currentTime.format('HH:mm'), "w/ deadline:",
                   habit.deadline.format('HH:mm'))
             self.completedTasks.append((habit, currentTime.timestamp, ))
@@ -83,7 +83,8 @@ class Schedule(HabitParser):
         for task in self.completedTasks:
             deadline = task[0].deadline
             today = arrow.get(task[1]).date()
-            deadline = deadline.replace(month=today.month, day=today.day)
+            deadline = deadline.replace(month=today.month, day=today.day,
+                                        tzinfo=LTZ)
             currentTime = arrow.Arrow.fromtimestamp(task[1])
 
             print(today, deadline, currentTime,
