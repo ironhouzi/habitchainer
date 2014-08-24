@@ -84,21 +84,23 @@ class Schedule(HabitParser):
             deadline = task[0].deadline
             today = arrow.get(task[1]).date()
             deadline = deadline.replace(month=today.month, day=today.day)
+            currentTime = arrow.Arrow.fromtimestamp(task[1])
 
-            print(today, deadline, arrow.get(task[1]), self.period(deadline.hour))
+            print(today, deadline, currentTime,
+                  self.period(deadline.hour))
 
-            if deadline > arrow.get(task[1]):
+            if deadline > currentTime:
                 distribution[self.period(deadline.hour)] -= 1
 
         values = (4, 2, 1,)
-        retval = 0
+        result = 0
 
         print(distribution)
         for i, f in enumerate(distribution):
             if f == 0:
-                retval += values[i]
+                result += values[i]
 
-        return retval
+        return result
 
     def getPendingHabit(self):
         habit = self.dequeue()
