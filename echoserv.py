@@ -65,6 +65,7 @@ class ScheduleFactory(Factory):
         return d
 
     def newDay(self):
+        print("New day ... ")
         status = self.schedule.getDailyStatus()
         print("Daily status:", status)
 

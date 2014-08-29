@@ -86,8 +86,7 @@ class Schedule(HabitParser):
                                         tzinfo=LTZ)
             currentTime = arrow.Arrow.fromtimestamp(task[1])
 
-            print(today, deadline, currentTime,
-                  self.period(deadline.hour))
+            print(today, deadline, currentTime)
 
             if deadline > currentTime:
                 distribution[self.period(deadline.hour)] -= 1
